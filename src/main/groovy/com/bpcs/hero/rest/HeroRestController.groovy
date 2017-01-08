@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController
  * Hero rest controller
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/heroes")
 class HeroRestController
 {
@@ -84,13 +85,13 @@ class HeroRestController
     @RequestMapping(method = RequestMethod.DELETE, value = "/{heroId}")
     ResponseEntity<Hero>  removeHero(@PathVariable Long heroId)
     {
-        Hero hero = heroRepository.getOne(heroId)
+        Hero hero = heroRepository.findOne(heroId)
 
         if (!hero)
         {
             return new ResponseEntity<Hero>(HttpStatus.NOT_FOUND)
         }
-        heroRepository.delete(hero)
+        heroRepository.delete(heroId)
         return new ResponseEntity<Hero>(hero, HttpStatus.OK)
     }
 }
