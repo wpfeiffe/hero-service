@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 @SuppressWarnings("unused")
 public interface DepartmentRepository extends JpaRepository<Department,Long>
 {
-
+    List<Department> findByCompany(Company company)
 }

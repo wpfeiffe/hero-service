@@ -2,15 +2,15 @@ package com.bpcs.hero.rest
 
 import com.bpcs.hero.domain.Company
 import com.bpcs.hero.domain.CompanyRepository
-import com.bpcs.hero.domain.Hero
-import com.bpcs.hero.domain.HeroRepository
+import com.bpcs.hero.service.CompanyNodeService
+import com.bpcs.hero.service.TreeNodeDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 /**
- * Hero rest controller
+ * Company rest controller
  */
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -20,11 +20,13 @@ class CompanyRestController
 {
 
     private final CompanyRepository companyRepository;
+    private final CompanyNodeService companyNodeService;
 
     @Autowired
-    CompanyRestController(CompanyRepository companyRepository)
+    CompanyRestController(CompanyRepository companyRepository, CompanyNodeService companyHierarchyService)
     {
         this.companyRepository = companyRepository
+        this.companyNodeService = companyHierarchyService
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -37,6 +39,18 @@ class CompanyRestController
             return new ResponseEntity<List<Company>>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<List<Company>>(companies, HttpStatus.OK)
+    }
+
+    @RequestMapping(value = "/treenodes", method = RequestMethod.GET)
+    ResponseEntity<List<TreeNodeDTO>> getCompanyTreeNodes()
+    {
+        List<TreeNodeDTO> companyNodes = companyNodeService.getCompanyNodes()
+
+        if (!companyNodes || companyNodes.size() == 0)
+        {
+            return new ResponseEntity<List<TreeNodeDTO>>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<TreeNodeDTO>>(companyNodes, HttpStatus.OK)
     }
 
     @RequestMapping(method = RequestMethod.POST)

@@ -69,6 +69,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/companies/**",
                 "/departments/**",
                 "/employees/**",
+                "/counter",
+                "/counterctl/**"
 //                "/heroes/**"
         ).permitAll()
         .antMatchers("/auth/**").permitAll()
