@@ -13,28 +13,30 @@ import javax.xml.soap.Text
 @Component
 class CounterHandler extends TextWebSocketHandler
 {
-    WebSocketSession session
+    List<WebSocketSession> sessions = []
 
     void counterIncrementCallback(int counter)
     {
         println  "Trying to send $counter"
 
-        if (session && session.isOpen())
-        {
-            try
+        sessions.each { WebSocketSession session ->
+            if (session && session.isOpen())
             {
-                println "Now sending $counter"
+                try
+                {
+                    println "Now sending $counter on session: ${session.id}"
 
-                session.sendMessage(new TextMessage("{\"value\": \"${counter}\"}"))
+                    session.sendMessage(new TextMessage("{\"value\": \"${counter}\"}"))
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace()
+                }
             }
-            catch (Exception e)
+            else
             {
-                e.printStackTrace()
+                println "Don't have a session to send $counter"
             }
-        }
-        else
-        {
-            println "Don't have a session to send $counter"
         }
     }
 
@@ -42,7 +44,7 @@ class CounterHandler extends TextWebSocketHandler
     void afterConnectionEstablished(WebSocketSession session)
     {
         println "Connection established"
-        this.session = session
+        this.sessions << session
     }
 
     @Override
@@ -51,6 +53,7 @@ class CounterHandler extends TextWebSocketHandler
         if ("CLOSE".equalsIgnoreCase(message.getPayload()))
         {
             session.close()
+            this.sessions.remove(session)
         }
         else
         {

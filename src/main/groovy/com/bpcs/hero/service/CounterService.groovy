@@ -19,7 +19,7 @@ class CounterService
     @Inject
     CounterHandler counterHandler
 
-    @Scheduled(fixedDelay = 1000L)
+    @Scheduled(fixedDelay = 6000L)
     void sendCounterUpdate()
     {
         if (enabled)

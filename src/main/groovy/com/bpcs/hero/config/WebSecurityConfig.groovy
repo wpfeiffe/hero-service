@@ -70,6 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/departments/**",
                 "/employees/**",
                 "/counter",
+                "/wsecho/**",
                 "/counterctl/**"
 //                "/heroes/**"
         ).permitAll()
