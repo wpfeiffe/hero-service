@@ -5,6 +5,7 @@ import com.bpcs.hero.domain.HeroRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-//@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/heroes")
 class HeroRestController
 {
 
     private final HeroRepository heroRepository;
+
+    @Autowired
+    private SimpMessagingTemplate brokerMessagingTemplate
 
     @Autowired
     HeroRestController(HeroRepository heroRepository)
@@ -52,6 +55,9 @@ class HeroRestController
             return new ResponseEntity<Hero>(HttpStatus.CONFLICT)
         }
         Hero resultHero = heroRepository.save(new Hero(input.name))
+
+        this.brokerMessagingTemplate.convertAndSend("/topic/hero", [action: "Add", hero: resultHero])
+
         return new ResponseEntity<Hero>(resultHero, HttpStatus.OK)
     }
 
@@ -67,6 +73,7 @@ class HeroRestController
 
         hero.name = input.name
         Hero resultHero = heroRepository.save(hero)
+        this.brokerMessagingTemplate.convertAndSend("/topic/hero", [action: "Update", hero: resultHero])
         return new ResponseEntity<Hero>(resultHero, HttpStatus.OK)
     }
 
@@ -79,6 +86,7 @@ class HeroRestController
         {
             return new ResponseEntity<Hero>(HttpStatus.NOT_FOUND)
         }
+        this.brokerMessagingTemplate.convertAndSend("/topic/hero", [action: "Get", hero: hero])
         return new ResponseEntity<Hero>(hero, HttpStatus.OK)
     }
 
@@ -92,6 +100,7 @@ class HeroRestController
             return new ResponseEntity<Hero>(HttpStatus.NOT_FOUND)
         }
         heroRepository.delete(heroId)
+        this.brokerMessagingTemplate.convertAndSend("/topic/hero", [action: "Delete", hero: hero])
         return new ResponseEntity<Hero>(hero, HttpStatus.OK)
     }
 }

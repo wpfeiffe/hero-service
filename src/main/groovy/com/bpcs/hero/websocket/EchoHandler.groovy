@@ -34,6 +34,8 @@ class EchoHandler extends TextWebSocketHandler
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception
     {
+        String textMessage = message.getPayload()
+        String messageToBroadcast = "SERVER SAYS: " + textMessage
         if ("CLOSE".equalsIgnoreCase(message.getPayload()))
         {
             session.close()
@@ -41,16 +43,15 @@ class EchoHandler extends TextWebSocketHandler
         }
         else
         {
-            logger.info ("Recieved ${message.getPayload()}")
-            this.broadCastMessage(message)
+            logger.info ("Recieved ${textMessage}")
+            this.broadCastMessage(messageToBroadcast)
         }
         logger.info("handleTextMessage() invoked")
 
     }
 
-    protected void broadCastMessage(WebSocketMessage<String> message)
+    protected void broadCastMessage(String messageToBroadcast)
     {
-        String messageToBroadcast = message.getPayload()
         TextMessage textMessage = new TextMessage("{\"value\": \"${messageToBroadcast}\"}")
         sessions.each { WebSocketSession session ->
             if (session && session.isOpen())
